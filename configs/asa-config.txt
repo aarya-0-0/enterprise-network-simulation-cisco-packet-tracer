@@ -1,0 +1,43 @@
+hostname ciscoasa
+names
+!
+interface GigabitEthernet1/1
+ nameif outside
+ security-level 0
+ ip address 192.168.100.2 255.255.255.0
+!
+interface GigabitEthernet1/2
+ nameif inside
+ security-level 100
+ ip address 192.168.200.1 255.255.255.0
+!
+interface GigabitEthernet1/3
+ nameif dmz
+ security-level 50
+ ip address 192.168.50.1 255.255.255.0
+!
+object network DMZ_WEB
+ host 192.168.50.10
+ nat (dmz,outside) static 192.168.100.2
+!
+route inside 192.168.10.0 255.255.255.0 192.168.200.2 1
+route inside 192.168.20.0 255.255.255.0 192.168.200.2 1
+route inside 192.168.30.0 255.255.255.0 192.168.200.2 1
+route outside 0.0.0.0 0.0.0.0 192.168.100.1 1
+!
+access-list outside extended deny ip any 192.168.10.0 255.255.255.0
+access-list outside extended deny ip any 192.168.20.0 255.255.255.0
+access-list outside extended deny ip any 192.168.30.0 255.255.255.0
+access-list outside extended permit tcp any host 192.168.50.10 eq www
+access-list DMZ_IN extended permit icmp host 192.168.50.10 host 192.168.50.1
+access-list DMZ_IN extended permit tcp host 192.168.50.10 eq www 192.168.10.0 255.255.255.0
+access-list DMZ_IN extended permit tcp host 192.168.50.10 eq www 192.168.20.0 255.255.255.0
+access-list DMZ_IN extended permit tcp host 192.168.50.10 eq www 192.168.30.0 255.255.255.0
+access-list INSIDE_IN extended permit tcp 192.168.10.0 255.255.255.0 host 192.168.50.10 eq www
+access-list INSIDE_IN extended permit tcp 192.168.20.0 255.255.255.0 host 192.168.50.10 eq www
+access-list INSIDE_IN extended permit tcp 192.168.30.0 255.255.255.0 host 192.168.50.10 eq www
+!
+!
+access-group DMZ_IN in interface dmz
+access-group INSIDE_IN in interface inside
+access-group outside in interface outside
