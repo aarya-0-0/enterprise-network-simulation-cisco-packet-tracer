@@ -1,0 +1,12 @@
+interface GigabitEthernet0/0
+ ip address 203.0.113.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ ip address 192.168.100.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 203.0.113.1
